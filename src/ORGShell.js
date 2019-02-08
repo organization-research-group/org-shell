@@ -86,7 +86,7 @@ module.exports = function makeORGShell({
     componentDidMount() {
       const loadCurrentWindowPath = pushState => {
         this.navigateTo(
-          route: Route.fromPath(window.location.search + window.location.hash),
+          Route.fromPath(window.location.search + window.location.hash),
           pushState,
         )
       }

@@ -7,7 +7,6 @@ const React = require('react')
     , PropTypes = require('prop-types')
     , { connect, Provider } = require('react-redux')
     , querystring = require('querystring')
-    , through = require('through2')
     , Route = require('./Route')
 
 const NotFound = () => h('h1', null, 'Not Found')
@@ -44,7 +43,6 @@ module.exports = function makeORGShell({
   baseTitle='',
 }, Component) {
   const store = createStore()
-      , locationStream = through.obj()
 
   resources = R.mapObjIndexed((resource, key) =>
     R.merge(resource, ({
@@ -72,22 +70,21 @@ module.exports = function makeORGShell({
 
       this.updateCurrentOpts = this.updateCurrentOpts.bind(this);
 
-      locationStream
-        .on('data', ({ route, pushState }) => {
-          this.setApplicationRoute(route, pushState)
-        })
-        .on('error', e => {
-          throw e;
-        })
+    }
+
+    navigateTo(route, pushState) {
+      this.setApplicationRoute(route, pushState)
     }
 
     getChildContext() {
-      return { locationStream }
+      return {
+        navigateTo: this.navigateTo,
+      }
     }
 
     componentDidMount() {
       const loadCurrentWindowPath = pushState => {
-        locationStream.write({
+        this.navigateTo({
           route: Route.fromPath(window.location.search + window.location.hash),
           pushState,
         })
@@ -215,7 +212,7 @@ module.exports = function makeORGShell({
   }
 
   ORGShell.childContextTypes = {
-    locationStream: PropTypes.object,
+    navigateTo: PropTypes.func,
   }
 
   return ORGShell

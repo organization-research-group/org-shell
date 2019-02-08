@@ -39,6 +39,7 @@ function makeTitledComponent(baseTitle, makeTitle) {
 module.exports = function makeORGShell({
   resources,
   createStore,
+  onRouteChange=R.T,
   NotFoundComponent=NotFound,
   baseTitle='',
 }, Component) {
@@ -126,6 +127,8 @@ module.exports = function makeORGShell({
         if (redirectTo) {
           this.setApplicationRoute(redirectTo);
         } else {
+          await onRouteChange(route, store)
+
           this.setState({
             activeResource: resource,
             activeParams: params,

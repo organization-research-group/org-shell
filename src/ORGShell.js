@@ -69,6 +69,7 @@ module.exports = function makeORGShell({
       }
 
       this.updateCurrentOpts = this.updateCurrentOpts.bind(this);
+      this.navigateTo = this.navigateTo.bind(this);
 
     }
 

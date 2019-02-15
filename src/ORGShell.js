@@ -191,7 +191,10 @@ module.exports = function makeORGShell({
 
       const innerOpts = {
         params: activeParams,
-        opts: activeOpts,
+
+        // For some reason, without doing this, it wouldn't trigger a re-render
+        // on the active component when the opts changed
+        opts: Object.assign({}, activeOpts),
         extra: activeExtra,
         updateOpts: this.updateCurrentOpts,
       }

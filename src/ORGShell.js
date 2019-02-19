@@ -3,9 +3,7 @@
 
 const React = require('react')
     , h = require('react-hyperscript')
-    , R = require('ramda')
     , PropTypes = require('prop-types')
-    , { connect, Provider } = require('react-redux')
     , querystring = require('querystring')
     , Route = require('./Route')
 
@@ -35,25 +33,24 @@ function makeTitledComponent(baseTitle, makeTitle) {
   )
 }
 
+function noop() {
+  return null
+}
+
 module.exports = function makeORGShell({
   resources,
-  createStore,
-  onRouteChange=R.T,
+  extraArgs,
+  onRouteChange=noop,
   NotFoundComponent=NotFound,
   baseTitle='',
 }, Component) {
-  const store = createStore()
+  const loadedResources = {}
 
-  resources = R.mapObjIndexed((resource, key) =>
-    R.merge(resource, ({
-      key,
-      Component: R.pipe(
-        makeTitledComponent(baseTitle, resource.makeTitle),
-        connect(resource.mapStateToProps || R.always({})),
-      )(resource.Component)
-    })),
-    resources
-  )
+  Object.entries(resources).forEach(([ key, resource ]) => {
+    loadedResources[key] = Object.assign({}, resource, {
+      Component: makeTitledComponent(baseTitle, resource.makeTitle)(resource.Component)
+    })
+  })
 
   class ORGShell extends React.Component {
     constructor() {
@@ -105,7 +102,7 @@ module.exports = function makeORGShell({
           , path = route.asURL()
           , redirect = url => redirectTo = url
 
-      const resource = resources[resourceName] || { Component: NotFoundComponent }
+      const resource = loadedResources[resourceName] || { Component: NotFoundComponent }
 
       this.setState({
         loading: true
@@ -116,16 +113,16 @@ module.exports = function makeORGShell({
 
         if (resource.onBeforeRoute) {
           extraProps = await resource.onBeforeRoute(
-            store.dispatch,
             params,
-            redirect
+            redirect,
+            extraArgs,
           )
         }
 
         if (redirectTo) {
           this.setApplicationRoute(redirectTo);
         } else {
-          await onRouteChange(route, store)
+          await onRouteChange(route, extraArgs)
 
           this.setState({
             activeResource: resource,
@@ -163,13 +160,16 @@ module.exports = function makeORGShell({
     updateCurrentOpts(fn) {
       const { activeOpts } = this.state
           , nextOpts = fn(activeOpts) || {}
+          , serialized = {}
+
+      Object.entries(nextOpts).forEach(([k, v]) => {
+        serialized[k] = JSON.stringify(v)
+      })
 
       this.setState(
         { activeOpts: nextOpts },
         () => {
-          const nextHash = querystring.stringify(
-            R.map(JSON.stringify, nextOpts)
-          )
+          const nextHash = querystring.stringify(serialized)
 
           let nextPath = window.location.pathname + window.location.search
 
@@ -191,25 +191,19 @@ module.exports = function makeORGShell({
 
       const innerOpts = {
         params: activeParams,
-
-        // For some reason, without doing this, it wouldn't trigger a re-render
-        // on the active component when the opts changed
-        opts: Object.assign({}, activeOpts),
+        opts: activeOpts,
         extra: activeExtra,
         updateOpts: this.updateCurrentOpts,
       }
 
-      const outerOpts = R.merge(innerOpts, {
-        store,
+      const outerOpts = Object.assign({}, innerOpts, {
         loading,
         activeResource,
       })
 
       return (
-        h(Provider, { store },
-          h(Component, outerOpts,
-            activeResource && h(activeResource.Component, innerOpts)
-          )
+        h(Component, outerOpts,
+          activeResource && h(activeResource.Component, innerOpts)
         )
       )
     }

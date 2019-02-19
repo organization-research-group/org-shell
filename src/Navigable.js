@@ -2,19 +2,17 @@
 
 const React = require('react')
     , h = React.createElement
-    , PropTypes = require('prop-types')
+    , NavigationContext = require('./context')
 
 module.exports = function makeNavigable(Component) {
   class Navigable extends React.Component {
     render () {
-      const { navigateTo } = this.context
-
-      return h(Component, Object.assign({ navigateTo }, this.props))
+      return (
+        h(NavigationContext.Consumer, {}, navigateTo =>
+          h(Component, Object.assign(this.props, { navigateTo }))
+        )
+      )
     }
-  }
-
-  Navigable.contextTypes = {
-    navigateTo: PropTypes.object,
   }
 
   return Navigable;

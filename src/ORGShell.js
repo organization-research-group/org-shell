@@ -6,6 +6,7 @@ const React = require('react')
     , PropTypes = require('prop-types')
     , querystring = require('querystring')
     , Route = require('./Route')
+    , NavigationContext = require('./context')
 
 const NotFound = () => h('h1', null, 'Not Found')
 
@@ -202,9 +203,11 @@ module.exports = function makeORGShell({
       })
 
       return (
-        h(Component, outerOpts,
+        h(NavigationContext.Provider, {
+          value: this.navigateTo,
+        }, h(Component, outerOpts,
           activeResource && h(activeResource.Component, innerOpts)
-        )
+        ))
       )
     }
   }

@@ -75,12 +75,6 @@ module.exports = function makeORGShell({
       this.setApplicationRoute(route, pushState)
     }
 
-    getChildContext() {
-      return {
-        navigateTo: this.navigateTo,
-      }
-    }
-
     componentDidMount() {
       const loadCurrentWindowPath = pushState => {
         this.navigateTo(
@@ -210,10 +204,6 @@ module.exports = function makeORGShell({
         ))
       )
     }
-  }
-
-  ORGShell.childContextTypes = {
-    navigateTo: PropTypes.func,
   }
 
   return ORGShell

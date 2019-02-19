@@ -9,7 +9,7 @@ module.exports = function makeNavigable(Component) {
     render () {
       return (
         h(NavigationContext.Consumer, {}, navigateTo =>
-          h(Component, Object.assign(this.props, { navigateTo }))
+          h(Component, Object.assign({}, this.props, { navigateTo }))
         )
       )
     }

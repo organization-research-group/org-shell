@@ -3,7 +3,6 @@
 
 const React = require('react')
     , h = require('react-hyperscript')
-    , PropTypes = require('prop-types')
     , querystring = require('querystring')
     , Route = require('./Route')
     , NavigationContext = require('./context')
@@ -117,13 +116,13 @@ module.exports = function makeORGShell({
         if (redirectTo) {
           this.setApplicationRoute(redirectTo);
         } else {
-          await onRouteChange(route, extraArgs)
-
           this.setState({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
             activeExtra: extraProps,
+          }, () => {
+            onRouteChange(route, extraArgs)
           })
 
           if (pushState) {

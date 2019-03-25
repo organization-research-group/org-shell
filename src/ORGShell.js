@@ -1,4 +1,3 @@
-
 "use strict";
 
 const React = require('react')
@@ -75,16 +74,16 @@ module.exports = function makeORGShell({
     }
 
     componentDidMount() {
-      const loadCurrentWindowPath = pushState => {
+      const loadCurrentWindowPath = () => {
         this.navigateTo(
           Route.fromPath(window.location.search + window.location.hash),
-          pushState,
+          false
         )
       }
 
-      window.onpopstate = loadCurrentWindowPath.bind(null, false);
+      window.onpopstate = loadCurrentWindowPath
 
-      loadCurrentWindowPath(true);
+      loadCurrentWindowPath();
     }
 
     async setApplicationRoute(route, pushState=true) {
@@ -102,6 +101,12 @@ module.exports = function makeORGShell({
         loading: true
       })
 
+      if (pushState) {
+        window.history.pushState(undefined, undefined, path);
+      } else {
+        window.history.replaceState(undefined, undefined, path);
+      }
+
       try {
         let extraProps = {}
 
@@ -114,7 +119,7 @@ module.exports = function makeORGShell({
         }
 
         if (redirectTo) {
-          this.setApplicationRoute(redirectTo);
+          this.setApplicationRoute(redirectTo, false);
         } else {
           this.setState({
             activeResource: resource,
@@ -124,16 +129,9 @@ module.exports = function makeORGShell({
           }, () => {
             onRouteChange(route, extraArgs)
           })
-
-          if (pushState) {
-            window.history.pushState(undefined, undefined, path);
-          }
         }
-      } catch (err) {
-          if (pushState) {
-            window.history.pushState(undefined, undefined, path);
-          }
 
+      } catch (err) {
           this.setState({
             activeResource: {
               Component: () => h('div', null, [

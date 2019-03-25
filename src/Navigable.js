@@ -2,7 +2,7 @@
 
 const React = require('react')
     , h = React.createElement
-    , NavigationContext = require('./context')
+    , { NavigationContext } = require('./context')
 
 module.exports = function makeNavigable(Component) {
   class Navigable extends React.Component {

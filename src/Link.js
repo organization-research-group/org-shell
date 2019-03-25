@@ -6,6 +6,7 @@ const React = require('react')
     , PropTypes = require('prop-types')
     , Route = require('./Route')
     , Navigable = require('./Navigable')
+    , { OrgShellConfigContext } = require('./context')
 
 module.exports = function makeInternalLink(Component) {
   const ORGShellLink = props => {
@@ -14,18 +15,22 @@ module.exports = function makeInternalLink(Component) {
 
     if (!isInternalLink) return h(Component, childProps)
 
-    return h(Component, Object.assign({}, childProps, {
-      href: props.route.asURL(),
-      onClick: e => {
-        const { route, pushState, navigateTo } = props
+    return (
+      h(OrgShellConfigContext.Consumer, {}, ({ serializeValue }) =>
+        h(Component, Object.assign({}, childProps, {
+          href: props.route._asURL(serializeValue),
+          onClick: e => {
+            const { route, pushState, navigateTo } = props
 
-        if (e.ctrlKey || e.shiftKey) return;
+            if (e.ctrlKey || e.shiftKey) return;
 
-        e.preventDefault();
+            e.preventDefault();
 
-        navigateTo({ route, pushState })
-      }
-    }), props.children)
+            navigateTo({ route, pushState })
+          }
+        }), props.children)
+      )
+    )
   }
 
   ORGShellLink.propTypes = {

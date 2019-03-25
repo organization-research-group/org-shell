@@ -11,13 +11,23 @@ function Route(resourceName, params, opts) {
   this.opts = opts || {};
 }
 
-Route.fromPath = path => {
+function mapObj(fn, obj) {
+  const mapped = {}
+
+  Object.entries(obj).forEach(([ k, v ]) => {
+    mapped[k] = v
+  })
+
+  return mapped
+}
+
+Route._fromPath = (path, deserializeValue) => {
   if (path[0] === '?') path = path.slice(1)
 
   const [ params, opts ] = path.split('#')
 
   const parsedParams = qs.parse(params)
-      , parsedOpts = R.map(JSON.parse, qs.parse(opts))
+      , parsedOpts = mapObj(deserializeValue, qs.parse(opts))
 
   return new Route(
     parsedParams.page || '',
@@ -26,9 +36,9 @@ Route.fromPath = path => {
   )
 }
 
-Route.prototype.asURL = function () {
+Route.prototype._asURL = function (serializeValue) {
   const params = qs.encode(this.params)
-      , opts = qs.encode(R.map(JSON.stringify, this.opts))
+      , opts = qs.encode(mapObj(serializeValue, this.opts))
 
   let url = '?page=' + this.resourceName
 

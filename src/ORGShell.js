@@ -4,7 +4,7 @@ const React = require('react')
     , h = require('react-hyperscript')
     , querystring = require('querystring')
     , Route = require('./Route')
-    , NavigationContext = require('./context')
+    , { NavigationContext, OrgShellConfigContext } = require('./context')
 
 const NotFound = () => h('h1', null, 'Not Found')
 
@@ -17,6 +17,10 @@ module.exports = function makeORGShell({
   extraArgs,
   onRouteChange=noop,
   NotFoundComponent=NotFound,
+  processOpts={
+    serializeValue: encodeURIComponent,
+    deserializeValue: decodeURIComponent,
+  },
 }, Component) {
   class ORGShell extends React.Component {
     constructor() {
@@ -41,8 +45,10 @@ module.exports = function makeORGShell({
 
     componentDidMount() {
       const loadCurrentWindowPath = () => {
+        const path = window.location.search + window.location.hash
+
         this.navigateTo(
-          Route.fromPath(window.location.search + window.location.hash),
+          Route._fromPath(path, processOpts.serializeValue),
           false
         )
       }
@@ -53,12 +59,12 @@ module.exports = function makeORGShell({
     }
 
     async setApplicationRoute(route, pushState=true) {
-      if (typeof route === 'string') route = Route.fromPath(route)
+      if (typeof route === 'string') route = Route._fromPath(route, processOpts.deserializeValue)
 
       let redirectTo
 
       const { resourceName, params, opts } = route
-          , path = route.asURL()
+          , path = route._asURL()
           , redirect = url => redirectTo = url
 
       const resource = resources[resourceName] || { Component: NotFoundComponent }
@@ -117,7 +123,7 @@ module.exports = function makeORGShell({
           , serialized = {}
 
       Object.entries(nextOpts).forEach(([k, v]) => {
-        serialized[k] = JSON.stringify(v)
+        serialized[k] = processOpts.serializeValue(v)
       })
 
       this.setState(
@@ -155,11 +161,14 @@ module.exports = function makeORGShell({
       })
 
       return (
-        h(NavigationContext.Provider, {
-          value: this.navigateTo,
-        }, h(Component, outerOpts,
-          activeResource && h(activeResource.Component, innerOpts)
-        ))
+        h(OrgShellConfigContext.Provider, {
+          value: processOpts
+        }, h(NavigationContext.Provider, {
+            value: this.navigateTo,
+          }, h(Component, outerOpts,
+            activeResource && h(activeResource.Component, innerOpts)
+          ))
+        )
       )
     }
   }

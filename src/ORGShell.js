@@ -8,30 +8,6 @@ const React = require('react')
 
 const NotFound = () => h('h1', null, 'Not Found')
 
-function makeTitledComponent(baseTitle, makeTitle) {
-  return Component =>  (
-    class TitledComponent extends React.Component {
-      componentDidMount() {
-        let title = '';
-
-        if (baseTitle) title += baseTitle;
-
-        if (makeTitle) {
-          const resourceTitle = makeTitle(this.props);
-          if (title) title += ' | ';
-          title += resourceTitle;
-        }
-
-        if (title) document.title = title;
-      }
-
-      render() {
-        return h(Component, this.props)
-      }
-    }
-  )
-}
-
 function noop() {
   return null
 }
@@ -41,16 +17,7 @@ module.exports = function makeORGShell({
   extraArgs,
   onRouteChange=noop,
   NotFoundComponent=NotFound,
-  baseTitle='',
 }, Component) {
-  const loadedResources = {}
-
-  Object.entries(resources).forEach(([ key, resource ]) => {
-    loadedResources[key] = Object.assign({}, resource, {
-      Component: makeTitledComponent(baseTitle, resource.makeTitle)(resource.Component)
-    })
-  })
-
   class ORGShell extends React.Component {
     constructor() {
       super();
@@ -61,7 +28,6 @@ module.exports = function makeORGShell({
         activeResource: null,
         activeParams: null,
         activeOpts: null,
-        activeExtra: null,
       }
 
       this.updateCurrentOpts = this.updateCurrentOpts.bind(this);
@@ -95,7 +61,7 @@ module.exports = function makeORGShell({
           , path = route.asURL()
           , redirect = url => redirectTo = url
 
-      const resource = loadedResources[resourceName] || { Component: NotFoundComponent }
+      const resource = resources[resourceName] || { Component: NotFoundComponent }
 
       this.setState({
         loading: true
@@ -108,10 +74,8 @@ module.exports = function makeORGShell({
       }
 
       try {
-        let extraProps = {}
-
         if (resource.onBeforeRoute) {
-          extraProps = await resource.onBeforeRoute(
+          await resource.onBeforeRoute(
             params,
             redirect,
             extraArgs,
@@ -125,7 +89,6 @@ module.exports = function makeORGShell({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
-            activeExtra: extraProps,
           }, () => {
             onRouteChange(route, extraArgs)
           })
@@ -141,7 +104,6 @@ module.exports = function makeORGShell({
             },
             activeParams: null,
             activeOpts: null,
-            activeExtra: null,
           })
 
       } finally {
@@ -178,13 +140,12 @@ module.exports = function makeORGShell({
         activeResource,
         activeParams,
         activeOpts,
-        activeExtra,
       } = this.state
 
       const innerOpts = {
+        resource: activeResource,
         params: activeParams,
         opts: activeOpts,
-        extra: activeExtra,
         updateOpts: this.updateCurrentOpts,
       }
 

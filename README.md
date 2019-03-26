@@ -21,8 +21,7 @@ const resources = {
     Component: () => (
       h('div', [
         h(Link('a'), {
-          resource: 'hello',
-          params: { name: 'Patrick' }
+          route: new Route('hello', { name: 'Patrick }),
         }, 'Home')
       ])
     )
@@ -43,7 +42,6 @@ const ApplicationContainer = props =>
   ])
 
 const Application = ORGShell({
-  store: createStore(),
   resources
 }, ApplicationContainer)
 
@@ -54,17 +52,19 @@ ReactDOM.render(Application)
 
 The main piece of this library is the higher-order component ORGShell. It takes several options, two of which are required.
 
-  * `opts.store` (required): A Redux store
+  * `resources` (required): A map of resources (see below)
 
-  * `opts.resources` (required): A map of resources (see below)
+  * `NotFoundComponent`: A component to be rendered when a resource is not found
 
-  * `opts.NotFoundComponent`: A component to be rendered when a resource is not found
+  * `processOpts: { serializeValue, deserializeValue }`: Functions to serialize and deserialize values when translating to/from the page's address
+
+  * `extraArgs`: A value that should be passed to resources' `onBeforeRoute` function
 
 ## Definining resources
 
-Resources are plain objects that have one required key (`Component`), and several optional ones that handle resource loading and prop mapping.
+Resources are plain objects. The following keys are significant:
 
-  * `Component`: The component that will be rendered for this resource. Several props are provided:
+  * `Component` (required): The React component that will be rendered for this resource. Several props are provided when this component is rendered:
 
     - `params`: An object of the static parameters passed to this resource
 
@@ -75,8 +75,17 @@ Resources are plain objects that have one required key (`Component`), and severa
         ```js
         updateOpts(prevOpts => Object.assign({}, prevOpts, { value: 4 }))
         ```
+    - `resource`: The object representing the resource
 
-# Route(resourceName, params)
+  * `onBeforeRoute`: A function that will be executed (and `await`ed) before the route switches to the resource. This function will receive three arguments:
+
+    - `params`: The static parameters passed to this resource
+
+    - `redirectTo`: A function that, when called, will redirect to a new route
+
+    - `extra`: The extra arguments passed to ORGShell initially
+
+# Route(resourceName, params, options)
 
 A simple constructor to refer to a route within the application, along with (optionally) some static parameters, such as an item ID or similar.
 

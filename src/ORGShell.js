@@ -96,7 +96,7 @@ module.exports = function makeORGShell({
             activeParams: params,
             activeOpts: opts,
           }, () => {
-            onRouteChange(route, extraArgs)
+            onRouteChange(route, resource, extraArgs)
           })
         }
 

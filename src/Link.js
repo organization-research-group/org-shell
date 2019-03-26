@@ -26,7 +26,7 @@ module.exports = function makeInternalLink(Component) {
 
             e.preventDefault();
 
-            navigateTo({ route, pushState })
+            navigateTo(route, pushState)
           }
         }), props.children)
       )

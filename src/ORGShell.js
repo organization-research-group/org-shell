@@ -12,14 +12,18 @@ function noop() {
   return null
 }
 
+function identity(x) {
+  return x
+}
+
 module.exports = function makeORGShell({
   resources,
   extraArgs,
   onRouteChange=noop,
   NotFoundComponent=NotFound,
   processOpts={
-    serializeValue: encodeURIComponent,
-    deserializeValue: decodeURIComponent,
+    serializeValue: identity,
+    deserializeValue: identity,
   },
 }, Component) {
   class ORGShell extends React.Component {

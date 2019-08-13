@@ -99,6 +99,7 @@ module.exports = function makeORGShell({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
+            activePath: new Route(resource.name, params)._asURL(),
           }, () => {
             onRouteChange(route, resource, extraArgs)
           })
@@ -150,6 +151,7 @@ module.exports = function makeORGShell({
         activeResource,
         activeParams,
         activeOpts,
+        activePath,
       } = this.state
 
       const innerOpts = {
@@ -160,6 +162,7 @@ module.exports = function makeORGShell({
       }
 
       const outerOpts = Object.assign({}, innerOpts, {
+        key: activePath,
         loading,
         activeResource,
       })

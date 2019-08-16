@@ -52,7 +52,7 @@ module.exports = function makeORGShell({
         const path = window.location.search + window.location.hash
 
         this.navigateTo(
-          Route._fromPath(path, processOpts.serializeValue),
+          Route._fromPath(path, processOpts.deserializeValue),
           false
         )
       }
@@ -68,7 +68,7 @@ module.exports = function makeORGShell({
       let redirectTo
 
       const { resourceName, params, opts } = route
-          , path = route._asURL()
+          , path = route._asURL(processOpts.serializeValue)
           , redirect = url => redirectTo = url
 
       const resource = resources[resourceName] || { Component: NotFoundComponent }
@@ -99,7 +99,7 @@ module.exports = function makeORGShell({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
-            activePath: new Route(resource.name, params)._asURL(),
+            activePath: new Route(resource.name, params)._asURL(processOpts.serializeValue),
           }, () => {
             onRouteChange(route, resource, extraArgs)
           })

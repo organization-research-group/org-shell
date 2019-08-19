@@ -1,7 +1,6 @@
 "use strict";
 
 const qs = require('querystring')
-    , R = require('ramda')
 
 function Route(resourceName, params, opts) {
   if (!(this instanceof Route)) return new Route(resourceName, params);
@@ -15,7 +14,7 @@ function mapObj(fn, obj) {
   const mapped = {}
 
   Object.entries(obj).forEach(([ k, v ]) => {
-    mapped[k] = v
+    mapped[k] = fn(v)
   })
 
   return mapped
@@ -26,14 +25,10 @@ Route._fromPath = (path, deserializeValue) => {
 
   const [ params, opts ] = path.split('#')
 
-  const parsedParams = qs.parse(params)
+  const { page='', ...parsedParams } = qs.parse(params)
       , parsedOpts = mapObj(deserializeValue, qs.parse(opts))
 
-  return new Route(
-    parsedParams.page || '',
-    R.omit(['page'], parsedParams),
-    parsedOpts
-  )
+  return new Route(page, parsedParams, parsedOpts)
 }
 
 Route.prototype._asURL = function (serializeValue) {

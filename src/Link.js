@@ -2,7 +2,6 @@
 
 const React = require('react')
     , h = React.createElement
-    , R = require('ramda')
     , PropTypes = require('prop-types')
     , Route = require('./Route')
     , Navigable = require('./Navigable')
@@ -11,24 +10,29 @@ const React = require('react')
 module.exports = function makeInternalLink(Component) {
   const ORGShellLink = props => {
     const isInternalLink = props.hasOwnProperty('route')
-        , childProps = R.omit(['navigateTo', 'route', 'pushState'], props)
+
+    const {
+      navigateTo,
+      route,
+      pushState,
+      children,
+      ...childProps
+    } = props
 
     if (!isInternalLink) return h(Component, childProps)
 
     return (
       h(OrgShellConfigContext.Consumer, {}, ({ serializeValue }) =>
         h(Component, Object.assign({}, childProps, {
-          href: props.route._asURL(serializeValue),
+          href: route._asURL(serializeValue),
           onClick: e => {
-            const { route, pushState, navigateTo } = props
-
             if (e.ctrlKey || e.shiftKey) return;
 
             e.preventDefault();
 
             navigateTo(route, pushState)
           }
-        }), props.children)
+        }), children)
       )
     )
   }

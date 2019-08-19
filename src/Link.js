@@ -15,7 +15,6 @@ module.exports = function makeInternalLink(Component) {
       navigateTo,
       route,
       pushState,
-      children,
       ...childProps
     } = props
 
@@ -23,7 +22,8 @@ module.exports = function makeInternalLink(Component) {
 
     return (
       h(OrgShellConfigContext.Consumer, {}, ({ serializeValue }) =>
-        h(Component, Object.assign({}, childProps, {
+        h(Component, {
+          ...childProps,
           href: route._asURL(serializeValue),
           onClick: e => {
             if (e.ctrlKey || e.shiftKey) return;
@@ -32,7 +32,7 @@ module.exports = function makeInternalLink(Component) {
 
             navigateTo(route, pushState)
           }
-        }), children)
+        })
       )
     )
   }

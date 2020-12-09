@@ -3,7 +3,7 @@
 const qs = require('querystring')
 
 function Route(resourceName, params, opts) {
-  if (!(this instanceof Route)) return new Route(resourceName, params);
+  if (!(this instanceof Route)) return new Route(resourceName, params, opts);
 
   this.resourceName = resourceName || '';
   this.params = params || {};

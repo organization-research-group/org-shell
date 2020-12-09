@@ -1,6 +1,6 @@
 {
   "name": "org-shell",
-  "version": "6.0.4",
+  "version": "6.0.5",
   "description": "",
   "main": "src/index.js",
   "keywords": [],

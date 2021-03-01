@@ -6,14 +6,11 @@
   "keywords": [],
   "author": "Patrick Golden <ptgolden@email.unc.edu>",
   "license": "CC0",
-  "browser": {
-    "querystring": "querystring-browser"
-  },
   "peerDependencies": {
     "react": ">= 16.0.0 < 18.0.0"
   },
   "dependencies": {
-    "querystring-browser": "^1.0.4",
+    "querystring": "^0.2.1",
     "react-hyperscript": "^3.2.0"
   },
   "devDependencies": {

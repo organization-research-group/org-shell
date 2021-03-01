@@ -1,22 +1,39 @@
 "use strict";
 
-const React = require('react')
-    , h = require('react-hyperscript')
-    , querystring = require('querystring')
-    , Route = require('./Route')
-    , { NavigationContext, OrgShellConfigContext } = require('./context')
+import * as React from 'react'
+import * as h from 'react-hyperscript'
+import * as querystring from 'querystring'
 
-const NotFound = () => h('h1', null, 'Not Found')
+import Route from './Route'
+import { NavigationContext, OrgShellConfigContext } from './context'
 
-function noop() {
-  return null
-}
+import {
+  ORGShellResource,
+  ORGShellConfig,
+  Params,
+  Opts
+} from './types'
 
-function identity(x) {
+
+const NotFound = () => h('h1', {}, 'Not Found')
+
+function noop() {}
+
+function identity(x: any) {
   return x
 }
 
-module.exports = function makeORGShell({
+interface Props {}
+
+interface State {
+  loading: boolean;
+  activeResource: ORGShellResource | null;
+  activeParams: Params | null;
+  activeOpts: Opts | null;
+  activePath: string | null;
+}
+
+export default function makeORGShell({
   resources,
   extraArgs,
   onRouteChange=noop,
@@ -25,10 +42,10 @@ module.exports = function makeORGShell({
     serializeValue: identity,
     deserializeValue: identity,
   },
-}, Component) {
-  class ORGShell extends React.Component {
-    constructor() {
-      super();
+}: ORGShellConfig, Component: any) {
+  class ORGShell extends React.Component<Props, State> {
+    constructor(props: Props, state: State) {
+      super(props);
 
       this.state = {
         loading: true,
@@ -36,6 +53,7 @@ module.exports = function makeORGShell({
         activeResource: null,
         activeParams: null,
         activeOpts: null,
+        activePath: null,
       }
 
       this.updateCurrentOpts = this.updateCurrentOpts.bind(this);
@@ -43,7 +61,7 @@ module.exports = function makeORGShell({
 
     }
 
-    navigateTo(route, pushState) {
+    navigateTo(route: Route, pushState?: boolean) {
       this.setApplicationRoute(route, pushState)
     }
 
@@ -62,14 +80,14 @@ module.exports = function makeORGShell({
       loadCurrentWindowPath();
     }
 
-    async setApplicationRoute(route, pushState=true) {
+    async setApplicationRoute(route: Route, pushState=true) {
       if (typeof route === 'string') route = Route._fromPath(route, processOpts.deserializeValue)
 
       let redirectTo
 
       const { resourceName, params, opts } = route
           , path = route._asURL(processOpts.serializeValue)
-          , redirect = url => redirectTo = url
+          , redirect = (url: string) => redirectTo = url
 
       const resource = resources[resourceName] || { Component: NotFoundComponent }
 
@@ -78,9 +96,9 @@ module.exports = function makeORGShell({
       })
 
       if (pushState) {
-        window.history.pushState(undefined, undefined, path);
+        window.history.pushState(undefined, document.title, path);
       } else {
-        window.history.replaceState(undefined, undefined, path);
+        window.history.replaceState(undefined, document.title, path);
       }
 
       try {
@@ -95,12 +113,14 @@ module.exports = function makeORGShell({
         if (redirectTo) {
           this.setApplicationRoute(redirectTo, false);
         } else {
+          route;
           this.setState({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
             activePath: new Route(resource.name, params)._asURL(processOpts.serializeValue),
           }, () => {
+            route
             onRouteChange(route, resource, extraArgs)
           })
         }
@@ -108,9 +128,10 @@ module.exports = function makeORGShell({
       } catch (err) {
           this.setState({
             activeResource: {
-              Component: () => h('div', null, [
-                h('h1', null, `Error while loading resource \`${resourceName}\``),
-                h('pre', null, err.stack || err),
+              name: '__not-found',
+              Component: () => h('div', {}, [
+                h('h1', {}, `Error while loading resource \`${resourceName}\``),
+                h('pre', {}, err.stack || err),
               ])
             },
             activeParams: null,
@@ -122,10 +143,10 @@ module.exports = function makeORGShell({
       }
     }
 
-    updateCurrentOpts(fn) {
+    updateCurrentOpts(fn: (prevOpts: Opts | null) => Opts | null) {
       const { activeOpts } = this.state
           , nextOpts = fn(activeOpts) || {}
-          , serialized = {}
+          , serialized: Record<string, any> = {}
 
       Object.entries(nextOpts).forEach(([k, v]) => {
         serialized[k] = processOpts.serializeValue(v)
@@ -140,7 +161,7 @@ module.exports = function makeORGShell({
 
           if (nextHash) nextPath += `#${nextHash}`
 
-          window.history.replaceState(undefined, undefined, nextPath);
+          window.history.replaceState(undefined, document.title, nextPath);
         }
       )
     }
@@ -171,7 +192,9 @@ module.exports = function makeORGShell({
         h(OrgShellConfigContext.Provider, {
           value: processOpts
         }, h(NavigationContext.Provider, {
-            value: this.navigateTo,
+            value: {
+              navigateTo: this.navigateTo,
+            },
           }, h(Component, outerOpts,
             activeResource && h(activeResource.Component, innerOpts)
           ))

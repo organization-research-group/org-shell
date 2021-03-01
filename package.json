@@ -15,5 +15,9 @@
   "dependencies": {
     "querystring-browser": "^1.0.4",
     "react-hyperscript": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.2",
+    "@types/react-hyperscript": "^3.0.5"
   }
 }

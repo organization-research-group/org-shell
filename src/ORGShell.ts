@@ -1,8 +1,7 @@
 "use strict";
 
-import * as React from 'react'
-import * as h from 'react-hyperscript'
-import * as querystring from 'querystring'
+import React, { createElement as h } from 'react'
+import querystring from 'querystring'
 
 import Route from './Route'
 import { NavigationContext, OrgShellConfigContext } from './context'
@@ -14,8 +13,11 @@ import {
   Opts
 } from './types'
 
-
-const NotFound = () => h('h1', {}, 'Not Found')
+function DefaultNotFound() {
+  return (
+    h('h1', null, 'Not found')
+  )
+}
 
 function noop() {}
 
@@ -37,7 +39,7 @@ export default function makeORGShell({
   resources,
   extraArgs,
   onRouteChange=noop,
-  NotFoundComponent=NotFound,
+  NotFoundComponent=DefaultNotFound,
   processOpts={
     serializeValue: identity,
     deserializeValue: identity,
@@ -129,9 +131,9 @@ export default function makeORGShell({
           this.setState({
             activeResource: {
               name: '__not-found',
-              Component: () => h('div', {}, [
-                h('h1', {}, `Error while loading resource \`${resourceName}\``),
-                h('pre', {}, err.stack || err),
+              Component: () => h('div', null, [
+                h('h1', null, `Error while loading resource \`${resourceName}\``),
+                h('pre', null, err.stack || err),
               ])
             },
             activeParams: null,

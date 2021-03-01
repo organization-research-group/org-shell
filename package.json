@@ -10,7 +10,7 @@
     "querystring": "querystring-browser"
   },
   "peerDependencies": {
-    "react": "^16.8.2"
+    "react": ">= 16.0.0 < 18.0.0"
   },
   "dependencies": {
     "querystring-browser": "^1.0.4",

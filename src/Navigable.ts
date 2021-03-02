@@ -1,10 +1,11 @@
 "use strict";
 
-import React, { useContext } from 'react'
+import * as React from 'react'
 
 import { NavigationContext, NavigationProps } from './context'
 
-const h = React.createElement
+const { useContext } = React
+    , h = React.createElement
 
 export function useNavigation() {
   const { navigateTo } = useContext(NavigationContext)!

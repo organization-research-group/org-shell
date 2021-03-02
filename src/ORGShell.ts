@@ -1,6 +1,6 @@
 "use strict";
 
-import React, { createElement as h } from 'react'
+import * as React from 'react'
 import querystring from 'querystring'
 
 import Route from './Route'
@@ -12,6 +12,8 @@ import {
   Params,
   Opts
 } from './types'
+
+const h = React.createElement
 
 function DefaultNotFound() {
   return (

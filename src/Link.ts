@@ -1,12 +1,13 @@
 "use strict";
 
-import React, { useContext } from 'react'
+import * as React from 'react'
 import * as PropTypes from 'prop-types'
 import Route from './Route'
 import { useNavigation } from './Navigable'
 import { OrgShellConfigContext, ORGShellConfigProps, NavigationProps } from './context'
 
 const h = React.createElement
+    , { useContext } = React
 
 interface ORGShellLinkProps {
   route?: Route;
@@ -18,7 +19,7 @@ interface ORGShellLinkExtra {
   onClick: (evt: React.MouseEvent) => void;
 }
 
-export function Link<P extends ORGShellLinkExtra>(
+export default function Link<P extends ORGShellLinkExtra>(
   Component: React.ComponentType<P>
 ) {
   function ORGShellLink(props: P & ORGShellLinkProps) {

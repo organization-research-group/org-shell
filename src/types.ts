@@ -12,7 +12,7 @@ export interface ORGShellResource {
   Component: any;
   onBeforeRoute?: (
     params: Params,
-    redirect: (url: string) => void,
+    redirect: (route: Route) => void,
     extraArgs: any
   ) => void;
 }

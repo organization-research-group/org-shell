@@ -91,11 +91,11 @@ export default function makeORGShell({
     async setApplicationRoute(route: Route, pushState=true) {
       if (typeof route === 'string') route = Route._fromPath(route, deserializeValue)
 
-      let redirectTo
+      let redirectTo: Route | null = null
 
       const { resourceName, params, opts } = route
           , path = route._asURL(serializeValue)
-          , redirect = (url: string) => redirectTo = url
+          , redirect = (route: Route) => redirectTo = route
 
       const resource = resources[resourceName] || { Component: NotFoundComponent }
 

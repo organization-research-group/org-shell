@@ -9,6 +9,8 @@ import { NavigationContext, OrgShellConfigContext } from './context'
 import {
   ORGShellResource,
   ORGShellConfig,
+  SerializeValue,
+  DeserializeValue,
   Params,
   Opts
 } from './types'
@@ -42,11 +44,13 @@ export default function makeORGShell({
   extraArgs,
   onRouteChange=noop,
   NotFoundComponent=DefaultNotFound,
-  processOpts={
-    serializeValue: identity,
-    deserializeValue: identity,
-  },
+  processOpts={},
 }: ORGShellConfig, Component: any) {
+    const {
+      serializeValue=identity,
+      deserializeValue=identity
+    } = processOpts
+
   class ORGShell extends React.Component<Props, State> {
     constructor(props: Props, state: State) {
       super(props);
@@ -74,7 +78,7 @@ export default function makeORGShell({
         const path = window.location.search + window.location.hash
 
         this.navigateTo(
-          Route._fromPath(path, processOpts.deserializeValue),
+          Route._fromPath(path, deserializeValue),
           false
         )
       }
@@ -85,12 +89,12 @@ export default function makeORGShell({
     }
 
     async setApplicationRoute(route: Route, pushState=true) {
-      if (typeof route === 'string') route = Route._fromPath(route, processOpts.deserializeValue)
+      if (typeof route === 'string') route = Route._fromPath(route, deserializeValue)
 
       let redirectTo
 
       const { resourceName, params, opts } = route
-          , path = route._asURL(processOpts.serializeValue)
+          , path = route._asURL(serializeValue)
           , redirect = (url: string) => redirectTo = url
 
       const resource = resources[resourceName] || { Component: NotFoundComponent }
@@ -122,7 +126,7 @@ export default function makeORGShell({
             activeResource: resource,
             activeParams: params,
             activeOpts: opts,
-            activePath: new Route(resource.name, params)._asURL(processOpts.serializeValue),
+            activePath: new Route(resource.name, params)._asURL(serializeValue),
           }, () => {
             route
             onRouteChange(route, resource, extraArgs)
@@ -153,7 +157,7 @@ export default function makeORGShell({
           , serialized: Record<string, any> = {}
 
       Object.entries(nextOpts).forEach(([k, v]) => {
-        serialized[k] = processOpts.serializeValue(v)
+        serialized[k] = serializeValue(v)
       })
 
       this.setState(
@@ -194,7 +198,10 @@ export default function makeORGShell({
 
       return (
         h(OrgShellConfigContext.Provider, {
-          value: processOpts
+          value: {
+            serializeValue,
+            deserializeValue,
+          },
         }, h(NavigationContext.Provider, {
             value: {
               navigateTo: this.navigateTo,

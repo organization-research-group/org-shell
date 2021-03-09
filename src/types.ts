@@ -23,7 +23,7 @@ export interface ORGShellConfig {
   NotFoundComponent: any;
   onRouteChange?: (route: Route, resource: ORGShellResource, extraArgs: any) => void;
   processOpts?: {
-    serializeValue: SerializeValue;
-    deserializeValue: DeserializeValue;
+    serializeValue?: SerializeValue;
+    deserializeValue?: DeserializeValue;
   }
 }

@@ -20,7 +20,7 @@ export interface ORGShellResource {
 export interface ORGShellConfig {
   resources: Record<string, ORGShellResource>;
   extraArgs?: any,
-  NotFoundComponent: any;
+  NotFoundComponent?: any;
   onRouteChange?: (route: Route, resource: ORGShellResource, extraArgs: any) => void;
   processOpts?: {
     serializeValue?: SerializeValue;

@@ -14,6 +14,9 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.2",
-    "@types/react-hyperscript": "^3.0.5"
+    "@types/react-dom": "^17.0.1",
+    "argparse": "^2.0.1",
+    "esbuild": "^0.8.54",
+    "react-dom": "^17.0.1"
   }
 }

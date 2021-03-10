@@ -5,14 +5,13 @@
       "dom"
     ],
     "module": "commonjs",
-    "allowJs": true,
-    "checkJs": true,
-    "noEmit": true,
 
     "allowSyntheticDefaultImports": true,
 
+    "noEmit": true,
     "strict": true,
 
     "moduleResolution": "node"
-  }
+  },
+  "include": ["src/**/*.ts"]
 }

@@ -4,7 +4,13 @@ import * as React from 'react'
 import querystring from 'querystring'
 
 import Route from './Route'
-import { NavigationContext, OrgShellConfigContext } from './context'
+
+import {
+  ORGShellNavigationContext,
+  ORGShellConfigContext,
+  ORGShellResourceContext,
+  ORGShellOptionsContext,
+} from './context'
 
 import {
   ORGShellResource,
@@ -35,7 +41,7 @@ interface State {
   loading: boolean;
   activeResource: ORGShellResource | null;
   activeParams: Params | null;
-  activeOpts: Opts | null;
+  activeOpts: Opts;
   activePath: string | null;
 }
 
@@ -60,7 +66,7 @@ export default function makeORGShell({
 
         activeResource: null,
         activeParams: null,
-        activeOpts: null,
+        activeOpts: {},
         activePath: null,
       }
 
@@ -143,7 +149,7 @@ export default function makeORGShell({
               ])
             },
             activeParams: null,
-            activeOpts: null,
+            activeOpts: {},
           })
 
       } finally {
@@ -151,10 +157,10 @@ export default function makeORGShell({
       }
     }
 
-    updateCurrentOpts(fn: (prevOpts: Opts | null) => Opts | null) {
+    updateCurrentOpts(update: ((prevOpts: Opts) => Opts | null)) {
       const { activeOpts } = this.state
-          , nextOpts = fn(activeOpts) || {}
           , serialized: Record<string, any> = {}
+          , nextOpts = update(activeOpts) || {}
 
       Object.entries(nextOpts).forEach(([k, v]) => {
         serialized[k] = serializeValue(v)
@@ -183,32 +189,40 @@ export default function makeORGShell({
         activePath,
       } = this.state
 
-      const innerOpts = {
-        resource: activeResource,
-        params: activeParams,
-        opts: activeOpts,
-        updateOpts: this.updateCurrentOpts,
-      }
-
-      const outerOpts = Object.assign({}, innerOpts, {
-        key: activePath,
-        loading,
-        activeResource,
-      })
-
       return (
-        h(OrgShellConfigContext.Provider, {
+        h(ORGShellConfigContext.Provider, {
           value: {
             serializeValue,
             deserializeValue,
           },
-        }, h(NavigationContext.Provider, {
+        },
+          h(ORGShellNavigationContext.Provider, {
             value: {
               navigateTo: this.navigateTo,
             },
-          }, h(Component, outerOpts,
-            activeResource && h(activeResource.Component, innerOpts)
-          ))
+          },
+            h(ORGShellResourceContext.Provider, {
+              value: {
+                loading,
+                resource: activeResource,
+                params: activeParams,
+                path: activePath,
+              },
+            },
+              h(ORGShellOptionsContext.Provider, {
+                value: {
+                  opts: activeOpts,
+                  updateOpts: this.updateCurrentOpts,
+                },
+              },
+                h(Component, null,
+                  activeResource && h(activeResource.Component, {
+                    key: activePath,
+                  })
+                )
+              )
+            )
+          )
         )
       )
     }

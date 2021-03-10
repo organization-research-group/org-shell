@@ -2,9 +2,14 @@
 
 import * as React from 'react'
 import * as PropTypes from 'prop-types'
+
 import Route from './Route'
-import { useNavigation } from './Navigable'
-import { OrgShellConfigContext, ORGShellConfigProps, NavigationProps } from './context'
+import {
+  useNavigation,
+  ORGShellConfigContext,
+  ORGShellConfigProps,
+  ORGShellNavigationProps
+} from './context'
 
 const h = React.createElement
     , { useContext } = React
@@ -23,7 +28,7 @@ export default function Link<P extends ORGShellLinkExtra>(
   Component: React.ComponentType<P>
 ) {
   function ORGShellLink(props: P & ORGShellLinkProps) {
-    const { serializeValue } = useContext(OrgShellConfigContext)!
+    const { serializeValue } = useContext(ORGShellConfigContext)!
         , navigateTo = useNavigation()
         , { route, pushState, ...childProps } = props
 

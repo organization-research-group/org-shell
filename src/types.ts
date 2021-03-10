@@ -3,7 +3,7 @@
 import Route from './Route'
 
 export type Params = Record<string, string | number>
-export type Opts = Record<string, any>
+export type Opts<P> = P
 export type SerializeValue = (arg: any) => string;
 export type DeserializeValue = (arg: string) => any;
 

@@ -23,8 +23,8 @@ export default class Route {
 
     let url: string = '?page=' + this.resourceName
 
-    if (params) url += `&{params}`
-    if (opts) url += `#{opts}`
+    if (params) url += `&${params}`
+    if (opts) url += `#${opts}`
 
     return url
   }

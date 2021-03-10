@@ -7,9 +7,11 @@
     "module": "commonjs",
 
     "allowSyntheticDefaultImports": true,
+    "emitDeclarationOnly": true,
 
-    "noEmit": true,
+    "declaration": true,
     "strict": true,
+    "out": "dist/index.js",
 
     "moduleResolution": "node"
   },

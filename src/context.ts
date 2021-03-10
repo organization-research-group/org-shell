@@ -97,10 +97,10 @@ export function ResourceAware<P>(
 
 /** Options context **/
 
-interface UpdateOpts<P> {
-  (updateFn: ((prevOpts: Opts<P>) => null)): void
-  (updateFn: ((prevOpts: Opts<P>) => Opts<P>)): void
-}
+export type UpdateOptsCallback<P> = (prevOpts: Opts<P>) => Opts<P>
+export type EmptyUpdateOptsCallback<P> = (prevOpts: Opts<P>) => null
+
+export type UpdateOpts<P> = (updateFn: UpdateOptsCallback<P> | EmptyUpdateOptsCallback<P>) => void
 
 export type ORGShellOptionsProps<P=any> = {
   opts: Opts<P>;

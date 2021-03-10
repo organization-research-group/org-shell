@@ -7,9 +7,9 @@ import { Params, Opts } from './types'
 export default class Route {
   resourceName: string;
   params: Params;
-  opts: Opts;
+  opts: Opts<any>;
 
-  constructor(resourceName: string, params?: Params, opts?: Opts) {
+  constructor(resourceName: string, params?: Params, opts?: Opts<any>) {
     this.resourceName = resourceName;
     this.params = params || {};
     this.opts = opts || {};

@@ -10,6 +10,9 @@ import {
   ORGShellConfigContext,
   ORGShellResourceContext,
   ORGShellOptionsContext,
+  UpdateOpts,
+  UpdateOptsCallback,
+  EmptyUpdateOptsCallback,
 } from './context'
 
 import {
@@ -41,7 +44,7 @@ interface State {
   loading: boolean;
   activeResource: ORGShellResource | null;
   activeParams: Params | null;
-  activeOpts: Opts;
+  activeOpts: Opts<any>;
   activePath: string | null;
 }
 
@@ -51,7 +54,7 @@ export default function makeORGShell({
   onRouteChange=noop,
   NotFoundComponent=DefaultNotFound,
   processOpts={},
-}: ORGShellConfig, Component: any) {
+}: ORGShellConfig, Component: any): React.ComponentClass {
     const {
       serializeValue=identity,
       deserializeValue=identity
@@ -157,10 +160,16 @@ export default function makeORGShell({
       }
     }
 
-    updateCurrentOpts(update: ((prevOpts: Opts) => Opts | null)) {
+    // FIXME: These type constraints should live elsewhere
+    updateCurrentOpts<P extends object>(update: UpdateOptsCallback<Partial<P>> | EmptyUpdateOptsCallback<P>) {
       const { activeOpts } = this.state
           , serialized: Record<string, any> = {}
-          , nextOpts = update(activeOpts) || {}
+
+      let nextOpts = update(activeOpts)
+
+      if (nextOpts == undefined) {
+        nextOpts = {}
+      }
 
       Object.entries(nextOpts).forEach(([k, v]) => {
         serialized[k] = serializeValue(v)

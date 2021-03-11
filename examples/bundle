@@ -1,0 +1,55 @@
+#! /usr/bin/env node
+
+"use strict";
+
+const { ArgumentParser } = require('argparse')
+    , { build, serve } = require('esbuild')
+
+const parser = new ArgumentParser({
+  description: 'ORG Shell example build script',
+})
+
+parser.add_argument('-o', '--output-file', { help: 'File to output', required: true })
+parser.add_argument('input_file', { help: 'Entry point' })
+parser.add_argument('--production', { help: 'Build for production', action: 'store_true' })
+parser.add_argument('--compress', { help: 'Compress output', action: 'store_true' })
+parser.add_argument('--serve', { help: 'Serve bundle from directory and rebuild when requested' })
+
+const args = parser.parse_args()
+
+const opts = {
+  entryPoints: [args.input_file],
+  bundle: true,
+  outfile: args.output_file,
+  define: {
+    'process.env.NODE_ENV': args.production ? '"production"' : '""',
+  },
+}
+
+if (args.serve) {
+  serve({
+    servedir: args.serve,
+    port: 9999,
+    onRequest({ method, path, status, timeInMS }) {
+      const date = new Date()
+          , message = `${date.toLocaleString()} | ${status} | ${method} ${path} (${timeInMS}ms)`
+
+      // eslint-disable-next-line no-console
+      console.log(message)
+    },
+  }, opts).then(({ host, port, stop }) => {
+      // eslint-disable-next-line no-console
+    console.log(`Serving on http://${host}:${port}/`)
+
+    process.on('SIGINT', () => {
+      // eslint-disable-next-line no-console
+      console.log('\nStopping server.')
+
+      stop()
+      process.exit();
+    })
+
+  })
+} else {
+  build(opts)
+}

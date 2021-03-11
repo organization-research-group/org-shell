@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "module": "commonjs",
+
+    "allowSyntheticDefaultImports": true,
+    "emitDeclarationOnly": true,
+
+    "declaration": true,
+    "strict": true,
+    "out": "dist/index.js",
+
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*.ts"]
+}

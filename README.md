@@ -89,7 +89,7 @@ A higher-order component to internally link between pages. Will provide an href 
 
 Several hooks are available to interact with your application.
 
-## useResource()
+## `useResource()`
 
 Provides information about the resource currently active in your application.
 
@@ -97,15 +97,15 @@ Provides information about the resource currently active in your application.
 const { loading, resource, params, path } = useResource()
 ```
 
-    - `loading`: A boolean value indicating whether a resource's `onBeforeRoute` method has completed
+- `loading`: A boolean value indicating whether a resource's `onBeforeRoute` method has completed
 
-    - `resource`: The definition of the resource defined when you initiated your application
+- `resource`: The definition of the resource defined when you initiated your application
 
-    - `params`: A key-value object of the query parameters present in the URL
+- `params`: A key-value object of the query parameters present in the URL
 
-    - `path`: The path currently loaded in your application, without the resource options appearing in the hash
+- `path`: The path currently loaded in your application, without the resource options appearing in the hash
 
-## useOptions()
+## `useOptions()`
 
 Provides the options currently passed to your active resource, as well as a function to update them. Unlike static parameters, changing the options will not cause the application to load a new resource.
 
@@ -113,12 +113,12 @@ Provides the options currently passed to your active resource, as well as a func
 const [ opts, updateOpts ] = useOptions()
 ```
 
-    - `opts`: A key-value object of dynamic options passed to the active resource. These options are persisted in the hash fragment of the URL. Each key-value pair is joined in the same way as multiple query parameters (e.g. `k1=v1&k2=v2&k3=v3`), and the values of those pairs are run through the `deserializeValue` function passed when initializing your application. This allows, for instance, persisting JSON values as options in the URL.
+- `opts`: A key-value object of dynamic options passed to the active resource. These options are persisted in the hash fragment of the URL. Each key-value pair is joined in the same way as multiple query parameters (e.g. `k1=v1&k2=v2&k3=v3`), and the values of those pairs are run through the `deserializeValue` function passed when initializing your application. This allows, for instance, persisting JSON values as options in the URL.
 
-    - `updateOpts(fn)`: A function to update the options passed to this resource. The function will be passed the current options and must return a key-value object representing the new options. These new options will be persisted in the URL after each value has been run through the `serializeValue` function provided when creating the application.
+- `updateOpts(fn)`: A function to update the options passed to this resource. The function will be passed the current options and must return a key-value object representing the new options. These new options will be persisted in the URL after each value has been run through the `serializeValue` function provided when creating the application.
 
 
-## useNavigation()
+## `useNavigation()`
 
 Provides a function to navigate the application to another resource.
 
@@ -126,4 +126,4 @@ Provides a function to navigate the application to another resource.
 const navigateTo = useNavigation()
 ```
 
-    - `navigateTo(route, pushState?)`: Make your application navigate to another internal resource. The first argument must be a `Route` object (see above). The second argument is a boolean value indicating how the browser will handle the navigation. If this argument is `true`, the new page will be inserted into the history using the browser's [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) function. If the argument is omitted or passed `false`, the browser will instead use [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState).
+- `navigateTo(route, pushState?)`: Make your application navigate to another internal resource. The first argument must be a `Route` object (see above). The second argument is a boolean value indicating how the browser will handle the navigation. If this argument is `true`, the new page will be inserted into the history using the browser's [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) function. If the argument is omitted or passed `false`, the browser will instead use [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState).
